@@ -49,7 +49,7 @@ public class PrincipalConsulta {
 		        System.out.print("Exemplo: 'NOME', 'EMAIL', 'CARGO' \n");
 		        String valores = sc.nextLine();
 		
-		        String db_query = acao + " INTO " + tabela + " VALUES(" + valores + ");";
+		        String db_query = acao + " INTO " + tabela + " (nome, email, cargo) VALUES(" + valores + ");";
 		        int linhasAfetadas = db.inserirAlterarExcluir(db_query);
 		        System.out.println(linhasAfetadas + " linha(s) afetada(s)");
             
@@ -78,7 +78,7 @@ public class PrincipalConsulta {
             	
                 int valor = sc.nextInt();
                 
-                String db_query = acao + " INTO " + tabela + " WHERE id = " + valor + ";";
+                String db_query = acao + " FROM " + tabela + " WHERE id = " + valor + ";";
                 int linhasAfetadas = db.inserirAlterarExcluir(db_query);
                 System.out.println(linhasAfetadas + " linha(s) afetada(s)");
 		    }
