@@ -1,128 +1,95 @@
 import java.util.Scanner;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.PreparedStatement;
-
 
 public class PrincipalConsulta {
-
-    public static void main(String[] args) throws Exception {
-    
+    public static void main(String[] args) {
         BancoDados db = new BancoDados();
+        
+        Scanner sc = new Scanner(System.in);
         
         String db_url = "jdbc:mysql://localhost:3306/reuniao";
         String db_user = "root";
         String db_password = "";
-        String db_query = "";
-        
+
         db.conectar(db_url, db_user, db_password);
+        
+        System.out.println("Acesso ao banco de dados reuniao realizado com sucesso!");
+
+
+        System.out.println("Escolha uma das opções:");
+        System.out.println("1 - Consultar dados");
+        System.out.println("2 - Inserir, alterar ou excluir dados");
+
+        int escolha = sc.nextInt();
+        sc.nextLine();
+
+        if (escolha == 1) {
+            System.out.print("Digite a consulta: ");
+            String db_query = sc.nextLine();
+            db.consultar(db_query + ";");
+            
+        } else if (escolha == 2) {
+        	System.out.print("---------------------------------------- \n");
+            System.out.print("Digite a ação desejada em *INGLÊS*: \n");
+            System.out.print("[INSERT] - Inserir um dado \n");
+            System.out.print("[UPDATE] - Alterar/atualizar um dado \n");
+            System.out.print("[DELETE] - Excluir um registro da tabela \n");
+            System.out.print("---------------------------------------- \n");
+            String acao = sc.nextLine();
+            
+            System.out.print("---------------------------------------- \n");
+            System.out.print("Digite a tabela em que essa ação ocorrerá: ");
+            
+            String tabela = sc.nextLine();
+            
+            if (acao.equals("INSERT")) {
+            	System.out.print("---------------------------------------- \n");
+		        System.out.print("Digite os valores na seguinte ordem: \n");
+		        System.out.print("***OBSERVAÇÃO*** \n");
+		        System.out.print("Dados em caracteres sempre com aspas ' ' \n");
+		        System.out.print("Exemplo: 'NOME', 'EMAIL', 'CARGO' \n");
+		        String valores = sc.nextLine();
+		
+		        String db_query = acao + " INTO " + tabela + " VALUES(" + valores + ");";
+		        int linhasAfetadas = db.inserirAlterarExcluir(db_query);
+		        System.out.println(linhasAfetadas + " linha(s) afetada(s)");
+            
+            } else if (acao.equals("UPDATE")) {
+            	System.out.print("---------------------------------------- \n");
+	            System.out.print("Digite os novos valores na seguinte ordem: \n");
+
+	            System.out.print("nome: \n");
+	            String nome = sc.nextLine();
+	            System.out.print("email: \n");
+	            String email = sc.nextLine();
+	            System.out.print("cargo: \n");
+	            String cargo = sc.nextLine();
+	            
+	            System.out.print("Qual ID irá ser alterado/atualizado? ");
+	            int num = sc.nextInt();
+	
+	            String db_query = acao + " " + tabela + " SET nome='" + nome + "', email='" + email + "', cargo='" + cargo +"' WHERE ID = " + num + ";";
+	            int linhasAfetadas = db.inserirAlterarExcluir(db_query);
+	            System.out.println(linhasAfetadas + " linha(s) afetada(s)"); 
+	            
+        
+		    } else if (acao.equals("DELETE")){
+		        System.out.print("---------------------------------------- \n");
+            	System.out.print("Digite o ID do registro que será excluído: ");
+            	
+                int valor = sc.nextInt();
                 
+                String db_query = acao + " INTO " + tabela + " WHERE id = " + valor + ";";
+                int linhasAfetadas = db.inserirAlterarExcluir(db_query);
+                System.out.println(linhasAfetadas + " linha(s) afetada(s)");
+		    }
+		}
+
+        sc.close();
         
-        System.out.println("Bem vindo a base de dados reuniao!");
-        System.out.println("----------------------------------------");
-        System.out.println("Qual ação gostaria de executar?");
-        System.out.println("[1] - Visualizar todos os dados");
-        System.out.println("[2] - Inserir dados");
-        System.out.println("[3] - Atualizar dados");
-        System.out.println("[4] - Excluir dados");
-        System.out.println("[5] - Nenhuma. Gostaria de desconectar");
-        System.out.println("----------------------------------------");
+        db.desconectar();
         
-        Scanner sc = new Scanner(System.in);
-        int dbCommand = sc.nextInt();
         
-        if(dbCommand == 1) {
-            db_query = ("SELECT * FROM pessoa;");
-            ResultSet rs = db.consultar(db_query);
-            
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                String nome = rs.getString("nome");
-                String email = rs.getString("email");
-                String cargo = rs.getString("cargo");
-                System.out.println(id + " - " + nome + " - " + email + " - " + cargo);
-            }
-            
-            rs.close();
-            
-        } else if (dbCommand == 2) {
-                System.out.println("Digite o ID do usuário: ");
-                int dbInsertId = sc.nextInt();
-
-                System.out.println("Digite o nome do usuário: ");
-                String dbInsertName = sc.next();
-
-                System.out.println("Digite o email do usuário: ");
-                String dbInsertEmail = sc.next();
-
-                System.out.println("Digite o cargo do usuário: ");
-                String dbInsertCargo = sc.next();
-
-                db_query = "INSERT INTO pessoa (id, nome, email, cargo) VALUES (?, ?, ?, ?)";
-                try (PreparedStatement ps = ((Statement) db).getConnection().prepareStatement(db_query)) {
-                    ps.setInt(1, dbInsertId);
-                    ps.setString(2, dbInsertName);
-                    ps.setString(3, dbInsertEmail);
-                    ps.setString(4, dbInsertCargo);
-                    ps.executeUpdate();
-                    System.out.println("Dados inseridos com sucesso!");
-                } catch (SQLException e) {
-                    System.err.println("Falha ao executar a operação: " + e.getMessage());
-                }
-            
-
-        } else if(dbCommand == 3) {
-            System.out.println("Digite o ID do usuário que deseja atualizar: ");
-            int dbUpdateId = sc.nextInt();
-            
-            System.out.println("Digite o nome do usuário: ");
-            String dbUpdateName = sc.next();
-            
-            System.out.println("Digite o email do usuário: ");
-            String dbUpdateEmail = sc.next();
-            
-            System.out.println("Digite o cargo do usuário: ");
-            String dbUpdateCargo = sc.next();
-            
-            db_query = "UPDATE pessoa SET nome = ?, email = ?, cargo = ? WHERE id = ?";
-            PreparedStatement ps = db.preparar(db_query);
-            ps.setString(1, dbUpdateName);
-            
-        } else if(dbCommand == 3) {
-        	System.out.println("Digite o ID do usuário que deseja alterar: ");
-        	int dbUpdateId = sc.nextInt();
-        	
-        	System.out.println("Digite o novo nome do usuário: ");
-        	String dbUpdateName = sc.next();
-
-        	System.out.println("Digite o novo email do usuário: ");
-        	String dbUpdateEmail = sc.next();
-
-        	System.out.println("Digite o novo cargo do usuário: ");
-        	String dbUpdateCargo = sc.next();
-
-        	db_query = "UPDATE pessoa SET nome = '" + dbUpdateName + "', email = '" + dbUpdateEmail + "', cargo = '" + dbUpdateCargo + "' WHERE id = " + dbUpdateId;
-        	db.inserirAlterarExcluir(db_query);
-        	System.out.println("Dados do usuário com ID " + dbUpdateId + " foram atualizados.");
-        	
-        } else if(dbCommand == 4) {
-        	System.out.println("Digite o(s) ID(s) do(s) usuário(s) que deseja excluir (separados por vírgula): ");
-        	String dbDelete = sc.next();
-        	
-        	db_query = "DELETE FROM pessoa WHERE id IN (" + dbDelete + ")";
-        	db.inserirAlterarExcluir(db_query);
-        	System.out.println("Usuário(s) com ID(s) " + dbDelete + " foram excluídos.");
-        } else if(dbCommand == 5) {
-        	db.desconectar();
-
-        	} else {
-        	System.out.println("Desculpe, não existe essa opção! Tente novamente.");
-        	}
-
-        	sc.close();
-
-        	}
-
-        }
+    }
+    	
+}
 
