@@ -1,15 +1,24 @@
 import java.sql.*;
+import java.io.IOException;
+
+
 
 public class BancoDados implements InterfaceBancoDados {
     private Connection c;
-
+    private Log meuLogger; 
+    
+    public BancoDados() throws IOException {
+        meuLogger = new Log("Log.txt");
+    }
+    
+    
     @Override
     public void conectar(String db_url, String db_user, String db_password) {
         try {
             c = DriverManager.getConnection(db_url, db_user, db_password);
-            System.out.println("\nConectado com sucesso ao banco de dados!");
+            meuLogger.logger.info("\n Conectado ao banco de dados");
         } catch (SQLException e) {
-            System.out.println("Erro ao se conectar ao banco de dados." + e.getMessage());
+        	meuLogger.logger.info("Erro ao se conectar ao banco de dados." + e.getMessage());
         }
     }
 
@@ -18,10 +27,10 @@ public class BancoDados implements InterfaceBancoDados {
         try {
             if (c != null) {
                 c.close();
-                System.out.println("Você foi desconectado do banco de dados!");
+                meuLogger.logger.info("Você foi desconectado do banco de dados!");
             }
         } catch (SQLException e) {
-            System.out.println("Erro ao se desconectar do banco de dados." + e.getMessage());
+        	meuLogger.logger.info("Erro ao se desconectar do banco de dados." + e.getMessage());
         }
     }
 
@@ -43,7 +52,7 @@ public class BancoDados implements InterfaceBancoDados {
             }
 
         } catch (SQLException e) {
-            System.out.println("Erro ao conectar: " + e);
+        	meuLogger.logger.info("Erro ao conectar: " + e);
         }
     }
 
@@ -53,7 +62,7 @@ public class BancoDados implements InterfaceBancoDados {
             Statement stmt = c.createStatement();
             return stmt.executeUpdate(db_query);
         } catch (SQLException e) {
-            System.out.println("Erro ao executar a ação: " + e.getMessage());
+        	meuLogger.logger.info("Erro ao executar a ação: " + e.getMessage());
             return 0;
         }
     }

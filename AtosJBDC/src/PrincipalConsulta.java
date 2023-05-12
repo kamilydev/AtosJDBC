@@ -1,9 +1,12 @@
 import java.util.Scanner;
+import java.io.IOException;
+
 
 public class PrincipalConsulta {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+    	
         BancoDados db = new BancoDados();
-        
+       
         Scanner sc = new Scanner(System.in);
         
         String db_url = "jdbc:mysql://localhost:3306/reuniao";
